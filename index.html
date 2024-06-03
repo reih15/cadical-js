@@ -16,12 +16,17 @@
 
     <meta charset="utf-8" />
     <title>CaDiCaL JS</title>
-    <meta name="description" content="CaDiCaL compiled with Emscripten" />
+    <meta name="description" content="SAT solver CaDiCaL compiled with Emscripten" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
 
   <body>
+    <h2>
+      SAT Solver <a href="https://github.com/arminbiere/cadical">CaDiCaL</a> in JavaScript (Compiled with
+      <a href="https://github.com/emscripten-core/emscripten">Emscripten</a>)
+    </h2>
+
     <div>
       Input CNF
       <br />
@@ -48,16 +53,6 @@
       <textarea readonly spellcheck="false" id="output"></textarea>
     </div>
 
-    <script>
-      const button = document.getElementById("solve");
-      const input = document.getElementById("cnf");
-      const output = document.getElementById("output");
-      const config = document.getElementById("configuration");
-
-      const parseWorkerFile = "parse-worker.js";
-      const solveWorkerFile = "solve-worker.js";
-    </script>
-    <script src="solve-cnf.js"></script>
     <script src="main.js"></script>
 
     <script src="cadical-emscripten.js"></script>
