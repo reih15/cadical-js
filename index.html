@@ -28,9 +28,19 @@
     </h2>
 
     <div>
-      Input CNF
+      <label for="cnf">Input CNF</label>
       <br />
-      <textarea id="cnf"></textarea>
+
+      <label for="dimacs-cnf" id="dimacs-cnf-label">DIMACS CNF</label>
+      <input type="checkbox" id="dimacs-cnf" />
+
+      <span>
+        <button id="example1">example1.cnf</button>
+        <button id="example2">example2.cnf</button>
+      </span>
+
+      <br />
+      <textarea spellcheck="false" id="cnf"></textarea>
     </div>
 
     <div>
@@ -48,7 +58,7 @@
     </div>
 
     <div>
-      Output
+      <label for="output">Output</label>
       <br />
       <textarea readonly spellcheck="false" id="output"></textarea>
     </div>
