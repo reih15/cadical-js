@@ -35,11 +35,11 @@ onmessage = (e) => {
     if (typeof result === "undefined") {
       resultStr = "c UNKNOWN";
     } else if (result) {
-      resultStr = "s SAT";
+      resultStr = "s SATISFIABLE";
       const sortedVars = Array.from(vars).sort((a, b) => a - b);
       resultStr += `\nv ${cadical.model(sortedVars).join(" ")} 0`;
     } else {
-      resultStr = "s UNSAT";
+      resultStr = "s UNSATISFIABLE";
     }
     cadical.printStatistics();
 

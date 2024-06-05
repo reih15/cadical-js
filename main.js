@@ -34,7 +34,7 @@ c You can add comment lines anywhere.
 -5
 
 c Expected result:
-c s SAT
+c s SATISFIABLE
 c v -1 -2 3 -5 10 0`;
 }
 
@@ -59,7 +59,7 @@ c Please make sure that "DIMACS CNF" is checked to parse multiline clauses or mu
 c You can skip adding '0' to the last clause.
 
 c Expected result:
-c s SAT
+c s SATISFIABLE
 c v -1 -2 3 -5 10 0`;
 }
 
