@@ -1,12 +1,15 @@
 "use strict";
 
+const NUM_LINES_TO_KEEP = 200;
+
 const solveButton = document.getElementById("solve");
-const checkbox = document.getElementById("dimacs-cnf");
+const dimacsCheckbox = document.getElementById("dimacs-cnf");
 const example1Button = document.getElementById("example1");
 const example2Button = document.getElementById("example2");
 const input = document.getElementById("cnf");
 const output = document.getElementById("output");
 const config = document.getElementById("configuration");
+const enumCheckbox = document.getElementById("enum-all");
 
 loadExampleCNF1();
 
@@ -64,6 +67,18 @@ c v -1 -2 3 -5 10 0`;
 }
 
 /**
+ * @param {string} s
+ */
+function appendToTextarea(s) {
+  output.value += s;
+
+  const lines = output.value.split("\n");
+  if (lines.length > NUM_LINES_TO_KEEP) {
+    output.value = lines.slice(-NUM_LINES_TO_KEEP).join("\n");
+  }
+}
+
+/**
  * solve CNF in textarea
  */
 function solveCNF() {
@@ -74,28 +89,67 @@ function solveCNF() {
   const cnf = input.value;
 
   const parseWorker = new Worker("parse-worker.js");
-  parseWorker.postMessage([cnf, checkbox.checked]);
+  parseWorker.postMessage([cnf, dimacsCheckbox.checked]);
 
   parseWorker.onmessage = (e) => {
     const cls = e.data;
 
     if (typeof cls === "undefined") {
-      output.value = "c parse failed";
+      appendToTextarea("\nc parse failed");
       solveButton.disabled = false;
       return;
     }
 
-    output.value += `\nc done (${(Date.now() - start) / 1000} s)`;
+    appendToTextarea(`\nc done (${(Date.now() - start) / 1000} s)`);
 
-    output.value += "\nc solving ...";
-    start = Date.now();
-    const solveWorker = new Worker("solve-worker.js");
-    solveWorker.postMessage([cls, config.value]);
+    if (enumCheckbox.checked) {
+      appendToTextarea("\nc enumerating ...");
+      let isWriting = false;
+      start = Date.now();
+      const enumWorker = new Worker("enum-worker.js");
+      enumWorker.postMessage([cls, config.value]);
 
-    solveWorker.onmessage = (e) => {
-      output.value += `\nc done (${(Date.now() - start) / 1000} s)`;
-      output.value += "\n" + e.data;
-      solveButton.disabled = false;
-    };
+      function appendToTextareaMutex(s, isLast) {
+        if (isWriting) {
+          setTimeout(() => appendToTextareaMutex(s, isLast), 10);
+          return;
+        }
+
+        isWriting = true;
+        appendToTextarea(s);
+        isWriting = false;
+
+        if (isLast) solveButton.disabled = false;
+      }
+
+      enumWorker.onmessage = (e) => {
+        switch (e.data[1]) {
+          case "UNKNOWN":
+            appendToTextareaMutex(`\nc UNKNOWN (${(Date.now() - start) / 1000} s)`, true);
+            break;
+          case "UNSATISFIABLE":
+            if (e.data[0] === 0) {
+              appendToTextareaMutex(`\nc done (${(Date.now() - start) / 1000} s)\ns UNSATISFIABLE`, true);
+            } else {
+              appendToTextareaMutex(`\nc done; UNSAT (${(Date.now() - start) / 1000} s)`, true);
+            }
+            break;
+          default:
+            appendToTextareaMutex(`\nc model ${e.data[0]} (${(Date.now() - start) / 1000} s)\n${e.data[1]}`, false);
+        }
+
+        start = Date.now();
+      };
+    } else {
+      appendToTextarea("\nc solving ...");
+      start = Date.now();
+      const solveWorker = new Worker("solve-worker.js");
+      solveWorker.postMessage([cls, config.value]);
+
+      solveWorker.onmessage = (e) => {
+        appendToTextarea(`\nc done (${(Date.now() - start) / 1000} s)\n${e.data}`);
+        solveButton.disabled = false;
+      };
+    }
   };
 }
