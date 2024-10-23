@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 This software uses the SAT solver CaDiCaL (https://github.com/arminbiere/cadical),
-which is under the MIT license. Original license text:
+which is under the MIT license. The original license text is as follows:
 
 MIT License
 
